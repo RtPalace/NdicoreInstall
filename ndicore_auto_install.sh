@@ -106,24 +106,13 @@ prepare_for_installation() {
 check_dependencys() {
     echo -e "${GREEN}⌛ Check dependencys...${NC}"
     # avahi
-    if command -v avahi-daemon &>/dev/null; then
-        echo -e "${YELLOW}avahi-daemon has been installed${NC}"
-    else
-        update_apt
-        local temp_log=$(mktemp)
-        if apt install avahi-daemon avahi-utils -qq -y >/dev/null 2>"$temp_log"; then
-            echo -e "${GREEN}✅ Successfully install avahi-daemon avahi-utils${NC}"
-            rm -f "$temp_log"
-        else
-            echo -e "${RED}❌ Failed to install avahi-daemon avahi-utils ${NC}"
-            echo -e "${RED}ERROR DETAILS:${NC}"
-            cat "$temp_log"
-            rm -f "$temp_log"
-            exit 1
-        fi
-    fi
-    apt_install "docker"
-    apt_install "curl"
+    apt_install "avahi-daemon avahi-utils"
+
+    # docker
+    apt_install docker.io
+
+    # curl
+    apt_install curl
 }
 
 update_apt() {
@@ -154,6 +143,7 @@ apt_install() {
         echo -e "${YELLOW}$pk has been installed${NC}"
         return 0
     fi
+    echo -e "${YELLOW}$pk not installed, needs to be installed... ${NC}"
     update_apt
     local temp_log=$(mktemp)
     if apt install $pk -qq -y >/dev/null 2>"$temp_log"; then
