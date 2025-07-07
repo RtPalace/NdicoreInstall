@@ -106,19 +106,20 @@ prepare_for_installation() {
 check_dependencys() {
     echo -e "${GREEN}⌛ Check dependencys...${NC}"
     # avahi
-    apt_install "avahi-daemon avahi-utils"
+    apt_install "avahi-daemon" "avahi-daemon avahi-utils"
 
     # docker
-    apt_install docker.io
+    apt_install "docker" docker.io
 
     # curl
-    apt_install curl
+    apt_install "curl" "curl"
 }
 
 update_apt() {
     if [ "$UPDATEED_APT" = "NO" ]; then
         local temp_log=$(mktemp)
         # 静默执行apt-get update但捕获错误
+        echo -e "${YELLOW}⌛ Update apt...${NC}"
         if apt-get update -qq >/dev/null 2>"$temp_log"; then
             UPDATEED_APT="YES"
             echo -e "${GREEN}✅ update apt OK${NC}"
@@ -138,19 +139,21 @@ update_apt() {
 }
 
 apt_install() {
-    local pk="$1"
+    local check_pk="$1"
+    local install_pk="$2"
     if command -v $pk &>/dev/null; then
-        echo -e "${YELLOW}$pk has been installed${NC}"
+        echo -e "${YELLOW}$check_pk has been installed${NC}"
         return 0
     fi
-    echo -e "${YELLOW}$pk not installed, needs to be installed... ${NC}"
+    echo -e "${YELLOW}$check_pk not installed, needs to be installed... ${NC}"
     update_apt
     local temp_log=$(mktemp)
-    if apt install $pk -qq -y >/dev/null 2>"$temp_log"; then
-        echo -e "${GREEN}✅ Successfully install $pk ${NC}"
+    echo -e "${YELLOW}⌛ Apt install $install_pk...${NC}"
+    if apt install $install_pk -qq -y >/dev/null 2>"$temp_log"; then
+        echo -e "${GREEN}✅ Successfully install $install_pk ${NC}"
         rm -f "$temp_log"
     else
-        echo -e "${RED}❌ Failed to install $pk ${NC}"
+        echo -e "${RED}❌ Failed to install $install_pk ${NC}"
         echo -e "\n${RED}ERROR DETAILS:${NC}"
         cat "$temp_log"
         rm -f "$temp_log"
