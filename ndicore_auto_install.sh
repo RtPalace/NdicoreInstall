@@ -354,7 +354,7 @@ restore_data() {
     # 是否恢复数据
     if [ "$BACKUP_DATA" = "YES" ]; then
         echo -e "${GREEN}⭐ ++++++++++++++++++++++++Restore data Start+++++++++++++++++++++++${NC}"
-        cp -rf "$BACKUP_DATA_TIME_PATH/*" $DATA_PATH
+        cp -rf $BACKUP_DATA_TIME_PATH/* $DATA_PATH
         echo -e "${GREEN}⭐ +++++++++++++++++++++++++Restore data End++++++++++++++++++++++++\n${NC}"
     fi
 }
