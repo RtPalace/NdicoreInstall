@@ -302,6 +302,15 @@ query_and_pull_image() {
         return 1
     fi
 
+    # 排序标签：latest排在最前，其他按版本号降序排列
+    local sorted_tags=$(echo "$tags" | while read -r tag; do
+        if [ "$tag" = "latest" ]; then
+            echo "1|$tag"  # 给latest最高优先级
+        else
+            echo "2|$tag"  # 其他标签按版本号排序
+        fi
+    done | sort -t'|' -k1,1n -k2,2Vr | cut -d'|' -f2)
+
     # 显示标签菜单
     echo "✅ Available ndicore image tags:"
     local i=1
@@ -310,7 +319,7 @@ query_and_pull_image() {
         echo "  [$i] "kiloview/ndicore":$tag"
         tag_list+=("$tag")
         ((i++))
-    done <<< "$tags"
+    done <<< "$sorted_tags"
 
     # 用户选择
     read -p "💡 Please enter the ndicore image to be pulled (1-$((i-1))): " choice
